@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { Typography, Box, Stack } from "@mui/material";
@@ -12,13 +12,16 @@ const VideoDetail = () => {
   const [videoDetail, setVideoDetail] = useState(null);
   const [videos, setVideos] = useState(null);
   const { id } = useParams();
+  const effectRan = useRef(false)
 
   useEffect(() => {
-    fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
-      .then((data) => setVideoDetail(data.items[0]))
+    if (effectRan.current === false) {
+      fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
+        .then((data) => setVideoDetail(data.items[0]))
 
-    fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
-      .then((data) => setVideos(data.items))
+      fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
+        .then((data) => setVideos(data.items))
+    }
   }, [id]);
 
   if (!videoDetail?.snippet) return <Loader />;
@@ -57,11 +60,11 @@ const VideoDetail = () => {
             </Stack>
           </Box>
           <Box sx={{ width: "100%", top: "86px" }}>
-          <Stack direction="row" gap="20px" alignItems="center">
-          <Typography variant="body1" sx={{ opacity: 0.7 }} color="#fff" p={2}>
-              {description}
-            </Typography>
-          </Stack>
+            <Stack direction="row" gap="20px" alignItems="center">
+              <Typography variant="body1" sx={{ opacity: 0.7 }} color="#fff" p={2}>
+                {description}
+              </Typography>
+            </Stack>
           </Box>
         </Box>
         <Box px={2} py={{ md: 1, xs: 5 }} justifyContent="center" alignItems="center" >
